@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanctum Quest</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+    <div class="container mx-auto p-6">
+        <!-- Top Navigation -->
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-4">
+                <img src="static/img/sanctum_logo.jpg" alt="Sanctum Quest Logo" class="w-10 h-10">
+                <div class="flex space-x-5">
+                    <button class="flex h-[46px] w-full items-center justify-center hover:text-gray-800 font-medium">Trade</button>
+                    <button class="flex h-[46px] w-full items-center justify-center hover:text-gray-800 font-medium">LSTs</button>
+                    <button class="flex h-[46px] w-full items-center justify-center hover:text-gray-800 font-medium">$CLOUD</button>
+                    <button class="flex h-[46px] w-full items-center justify-center hover:text-gray-800 font-medium font-bold">Leaderboard</button>
+                </div>
+            </div>
+            <button class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
+                Connect
+            </button>
+        </div>
+    
+        <!-- Header -->
+        <h1 class="text-3xl font-bold text-center mb-6">Sanctum Quest</h1>
+    
+        <!-- Search Bar -->
+        <div class="mb-4 max-w-xl mx-auto">
+            <input 
+                type="text" 
+                name="name"
+                placeholder="Search by name..." 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                hx-get="/search" 
+                hx-trigger="keyup changed delay:300ms" 
+                hx-target="#leaderboard-body" 
+                hx-swap="innerHTML">
+        </div>
+    
+        <!-- Leaderboard Table -->
+        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-4">
+            <table class="table-auto w-full text-left">
+                <thead class="bg-gray-50 text-gray-600">
+                    <!-- <tr>
+                        <th class="px-4 py-3 text-sm font-medium">Rank</th>
+                        <th class="px-4 py-3 text-sm font-medium">Name</th>
+                        <th class="px-4 py-3 text-sm font-medium">Score</th>
+                    </tr> -->
+                </thead>
+                <tbody id="leaderboard-body" hx-get="/update-leaderboard" hx-trigger="load" hx-swap="innerHTML">
+                    <!-- Rows will be dynamically updated -->
+                </tbody>
+            </table>
+        </div>
+    </div>    
+</body>
+</html>

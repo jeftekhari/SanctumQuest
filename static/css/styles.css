@@ -1,0 +1,51 @@
+.hidden {
+    display: none;
+}
+
+.expanded {
+    display: table-row;
+}
+
+/* Ensure icons are circular */
+img.w-8.h-8 {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    vertical-align: middle;
+    border-radius: 50%; /* Ensures rounded edges */
+}
+
+/* Tooltip Styling */
+.tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 4px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+
+span.group-hover:block {
+    display: none;
+} 
+
+.group:hover span {
+    display: inline-block;
+}
+
+span {
+    color: #fff;
+    font-size: 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+    padding: 4px 6px;
+    z-index: 10;
+}
+

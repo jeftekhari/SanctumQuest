@@ -1,0 +1,14 @@
+<div class="p-4 flex items-center space-x-2">
+    {% for pet in user.pets[:3] %}
+    <div class="relative group">
+        <img src="/static/img/icons/{{ pet.petName | lower }}.png" alt="{{ pet.petName }}" class="w-8 h-8 rounded-full">
+        <span class="absolute bottom-full mb-1 px-2 py-1 text-xs text-white bg-gray-800 rounded hidden group-hover:block">
+            {{ pet.petName }}
+        </span>
+    </div>
+    {% endfor %}
+
+    {% if user.pets|length > 3 %}
+    <span class="text-sm">(+{{ user.pets|length - 3 }})</span>
+    {% endif %}
+</div>

@@ -1,0 +1,37 @@
+{% for entry in data %}
+<tr class="bg-gray-50 hover:bg-gray-100 cursor-pointer">
+    <td class="p-4">
+        <!-- Display all relevant data in one column -->
+        <div class="flex flex-col">
+            <!-- Top row: Rank, Name, and Score -->
+            <div class="flex justify-between items-center mb-2">
+                <div class="font-bold text-gray-800">{{ entry.rank }}. {{ entry.name }}</div>
+                <div class="text-sm text-gray-600">Score: {{ entry.score }}</div>
+            </div>
+            
+            <!-- Pet icons -->
+            {% if entry.pets is defined and entry.pets %}
+            <div class="flex items-center space-x-2">
+                {% for pet in entry.pets[:3] %}
+                <div class="relative group">
+                    <img src="/static/img/icons/{{ pet.petName | lower }}.png" alt="{{ pet.petName }}" class="w-8 h-8 rounded-full">
+                    <span class="absolute bottom-full mb-1 px-2 py-1 text-xs text-white bg-gray-800 rounded hidden group-hover:block">
+                        {{ pet.petName }}
+                    </span>
+                </div>
+                {% endfor %}
+                {% if entry.pets|length > 3 %}
+                <span class="text-gray-500 text-sm">(+{{ entry.pets|length - 3 }})</span>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="text-sm text-gray-500">No pets</div>
+            {% endif %}
+        </div>
+    </td>
+</tr>
+{% else %}
+<tr class="bg-gray-50">
+    <td class="p-4 text-center text-gray-600">No results found</td>
+</tr>
+{% endfor %}

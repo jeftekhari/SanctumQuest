@@ -1,0 +1,115 @@
+[
+    {
+        "rank": 1, 
+        "name": "Bengshark", 
+        "score": 1000,
+        "pets": [
+            {"petName": "infinitie", "petLevel": 5},
+            {"petName": "jucie", "petLevel": 10}
+        ]
+    },
+    {
+        "rank": 2, 
+        "name": "Manboy", 
+        "score": 900,
+        "pets": [
+            {"petName": "driftie", "petLevel": 3}
+        ]
+    },
+    {
+        "rank": 3, 
+        "name": "J", 
+        "score": 850,
+        "pets": [
+            {"petName": "stonkie", "petLevel": 7},
+            {"petName": "hubbie", "petLevel": 6},
+            {"petName": "clocksie", "petLevel": 2},
+            {"petName": "helie", "petLevel": 10},
+            {"petName": "bonksie", "petLevel": 4}
+        ]
+    },
+    {
+        "rank": 4, 
+        "name": "seslly", 
+        "score": 800
+    },
+    {
+        "rank": 5, 
+        "name": "J.D. SOL", 
+        "score": 750,
+        "pets": [
+            {"petName": "lanternie", "petLevel": 7},
+            {"petName": "lainie", "petLevel": 6},
+            {"petName": "picolo", "petLevel": 2},
+            {"petName": "powie", "petLevel": 10},
+            {"petName": "stakie", "petLevel": 4}
+        ]
+    },
+    {
+        "rank": 6, 
+        "name": "cho_cho", 
+        "score": 700,
+        "pets": [
+            {"petName": "stonkie", "petLevel": 7},
+            {"petName": "superfastie", "petLevel": 6},
+            {"petName": "teafsie", "petLevel": 2},
+            {"petName": "vaultie", "petLevel": 10},
+            {"petName": "bonksie", "petLevel": 4},
+            {"petName": "infinitie", "petLevel": 10},
+            {"petName": "lainie", "petLevel": 4},
+            {"petName": "picolo", "petLevel": 10},
+            {"petName": "clocksie", "petLevel": 4}
+        ]
+    },
+    {
+        "rank": 7, 
+        "name": "Halfa", 
+        "score": 699,
+        "pets": [
+            {"petName": "clocksie", "petLevel": 7},
+            {"petName": "compie", "petLevel": 6},
+            {"petName": "driftie", "petLevel": 2}
+        ]
+    },
+    {
+        "rank": 8, 
+        "name": "guacamole", 
+        "score": 670,
+        "pets": [
+            {"petName": "helie", "petLevel": 7},
+            {"petName": "hubbie", "petLevel": 6}
+        ]
+    },
+    {
+        "rank": 9, 
+        "name": "Alkine", 
+        "score": 600,
+        "pets": [
+            {"petName": "infinitie", "petLevel": 7},
+            {"petName": "picolo", "petLevel": 6},
+            {"petName": "stakie", "petLevel": 2},
+            {"petName": "helie", "petLevel": 10},
+            {"petName": "bonksie", "petLevel": 4},
+            {"petName": "helie", "petLevel": 10}
+        ]
+    },
+    {
+        "rank": 10, 
+        "name": "zionatlas", 
+        "score": 599,
+        "pets": [
+            {"petName": "superfastie", "petLevel": 7},
+            {"petName": "teafsie", "petLevel": 6},
+            {"petName": "helie", "petLevel": 2},
+            {"petName": "compie", "petLevel": 10}        
+        ]
+    },
+    {
+        "rank": 11, 
+        "name": "FP", 
+        "score": 5,
+        "pets": [
+            {"petName": "infinitie", "petLevel": 7}
+        ]
+    }
+]
