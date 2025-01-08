@@ -1,7 +1,47 @@
 from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS
+from solders.pubkey import Pubkey 
+from solana.rpc.api import Client
+from nacl.signing import VerifyKey
+from nacl.exceptions import BadSignatureError
+import os
 import json
 
 app = Flask(__name__, static_folder='static')
+CORS(app)
+
+# Solana RPC client (optional if you need on-chain validation)
+solana_client = Client("https://api.mainnet-beta.solana.com")
+
+# Endpoint to generate a message for signing
+@app.route('/generate-message', methods=['GET'])
+def generate_message():
+    # Generate a unique message (e.g., using a nonce or timestamp)
+    message = f"Sign this message to authenticate. Timestamp: {os.urandom(16).hex()}"
+    return jsonify({"message": message})
+
+# Endpoint to verify the signed message
+@app.route('/verify-signature', methods=['POST'])
+def verify_signature():
+    data = request.json
+    wallet_address = data.get('wallet_address')
+    signature = data.get('signature')
+    message = data.get('message')
+
+    if not wallet_address or not signature or not message:
+        return jsonify({"success": False, "error": "Missing required fields"}), 400
+
+    try:
+        # Decode the public key and signature
+        public_key = Pubkey.from_string(wallet_address)
+        verify_key = VerifyKey(bytes(public_key))
+
+        # Verify the signature
+        verify_key.verify(message.encode(), bytes(signature["data"]))
+        return jsonify({"success": True, "message": "Signature verified!"})
+    except BadSignatureError:
+        return jsonify({"success": False, "error": "Invalid signature"}), 400
+
 
 @app.route("/")
 def leaderboard():
