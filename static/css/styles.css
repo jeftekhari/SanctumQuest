@@ -49,3 +49,21 @@ span {
     z-index: 10;
 }
 
+#settings-modal {
+    z-index: 50; /* Ensures modal is above other content */
+    position: fixed; /* Keeps the modal positioned correctly */
+    inset: 0; /* Covers the entire viewport */
+    background-color: rgba(0, 0, 0, 0.5); /* Dimmed background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#settings-modal.hidden {
+    display: none;
+}
+
+table {
+    z-index: 10; /* Lower priority compared to modal */
+    position: relative;
+}

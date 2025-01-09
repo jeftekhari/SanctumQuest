@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/htmx.org"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="/static/css/styles.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans">
     <div class="container mx-auto p-6">
@@ -23,11 +24,27 @@
             </div>
             <div class="flex items-center space-x-3">
                 <!-- Settings Cogwheel -->
-                <button id="settings-button" class="bg-gray-300 text-gray-400 px-3 py-2 rounded-full cursor-not-allowed">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9.375V4m0 0a8 8 0 018 8m-8 8a8 8 0 01-8-8m0 0V4m0 0L12 9.375m0 0L4 12m16 0a8 8 0 01-8 8m0 0v-5.375M12 4v5.375" />
-                    </svg>
+                <button id="settings-button" class="bg-gray-300 text-gray-400 px-3 py-2 rounded-full cursor-not-allowed" disabled onclick="openSettingsModal()">
+                    <i class="fas fa-cog text-xl"></i>
                 </button>
+
+                <!-- Settings Modal -->
+                <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+                    <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+                        <h2 class="text-lg font-bold mb-4">Edit Settings</h2>
+                        
+                        <!-- Edit Name Form -->
+                        <div class="mb-4">
+                            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                            <input type="text" id="name-input" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:border-blue-300">
+                        </div>
+                        
+                        <div class="flex justify-end space-x-2">
+                            <button onclick="closeSettingsModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md">Cancel</button>
+                            <button onclick="saveSettings()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Save</button>
+                        </div>
+                    </div>
+                </div>
                 <!-- Connect Button -->
                 <button id="connect-button" onclick="signInWithWallet()" class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
                     Connect
@@ -55,70 +72,155 @@
         <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-4">
             <table class="table-auto w-full text-left">
                 <thead class="bg-gray-50 text-gray-600">
-                    <!-- <tr>
-                        <th class="px-4 py-3 text-sm font-medium">Rank</th>
-                        <th class="px-4 py-3 text-sm font-medium">Name</th>
-                        <th class="px-4 py-3 text-sm font-medium">Score</th>
-                    </tr> -->
                 </thead>
                 <tbody id="leaderboard-body" hx-get="/update-leaderboard" hx-trigger="load" hx-swap="innerHTML">
                     <!-- Rows will be dynamically updated -->
                 </tbody>
             </table>
         </div>
-    </div>    
+    </div>
+    <input type="hidden" id="hiddenWalletAddress" name="hiddenAddress" value="">    
 </body>
 </html>
 
 <script>
-    async function signInWithWallet() {
-    if (!window.solana || !window.solana.isPhantom) {
-        alert("Phantom Wallet is not installed.");
-        return;
-    }
+    async function openSettingsModal() {
+        const modal = document.getElementById('settings-modal');
+        const nameInput = document.getElementById('name-input');
+        const hiddenAddressField = document.getElementById("hiddenWalletAddress");
+        const walletAddress = hiddenAddressField.value;
 
-    try {
-        // Connect to the wallet
-        const response = await window.solana.connect();
-        const walletAddress = response.publicKey.toString();
-
-        // Fetch a message to sign
-        const messageResponse = await fetch('http://localhost:5000/generate-message');
-        const { message } = await messageResponse.json();
-
-        // Sign the message
-        const encodedMessage = new TextEncoder().encode(message);
-        const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
-
-        // Send the signature to the backend
-        const verifyResponse = await fetch('http://localhost:5000/verify-signature', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                wallet_address: walletAddress,
-                message: message,
-                signature: signedMessage.signature
-            })
-        });
-
-        const verifyResult = await verifyResponse.json();
-        if (verifyResult.success) {
-            // Update Connect button text
-            const connectButton = document.getElementById('connect-button');
-            connectButton.textContent = `${walletAddress.slice(0, 5)}...`;
-
-            // Enable the settings cogwheel
-            const settingsButton = document.getElementById('settings-button');
-            settingsButton.classList.remove('bg-gray-300', 'text-gray-400', 'cursor-not-allowed');
-            settingsButton.classList.add('bg-gray-100', 'text-gray-800', 'hover:bg-gray-200');
-            settingsButton.disabled = false;
-
-            alert("Wallet successfully signed in!");
-        } else {
-            alert("Signature verification failed: " + verifyResult.error);
+        if (!walletAddress) {
+            alert("Wallet address is missing.");
+            return;
         }
-    } catch (error) {
-        console.error("Wallet signing error:", error);
+
+        try {
+            // Fetch user details
+            const response = await fetch('http://localhost:5000/get-user-details', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ wallet_address: walletAddress })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                // Prefill the name input with the current name
+                nameInput.value = result.user.name || '';
+            } else {
+                alert(`Error fetching user details: ${result.error || "Unknown error"}`);
+                nameInput.value = ''; // Clear the input field if no user found
+            }
+
+            // Show the modal
+            modal.classList.remove('hidden');
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+        }
     }
-}
+
+    function closeSettingsModal() {
+        document.getElementById('settings-modal').classList.add('hidden');
+    }
+
+    async function saveSettings() {
+        const nameInput = document.getElementById('name-input').value;
+
+        if (!nameInput.trim()) {
+            alert("Name cannot be empty.");
+            return;
+        }
+
+        try {
+            const hiddenAddressField = document.getElementById("hiddenWalletAddress")
+            const walletAddress = hiddenAddressField.value;
+
+            const response = await fetch('http://localhost:5000/update-record', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ wallet_address: walletAddress, name: nameInput })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                closeSettingsModal();
+
+                // Refresh the leaderboard
+                const leaderboardBody = document.getElementById('leaderboard-body');
+                leaderboardBody.innerHTML = ''; // Clear existing content
+                const updateResponse = await fetch('http://localhost:5000/update-leaderboard');
+                leaderboardBody.innerHTML = await updateResponse.text();
+            } else {
+                alert(`Error updating settings: ${result.error || "Unknown error"}`);
+            }
+        } catch (error) {
+            console.error("Error updating settings:", error);
+        }
+    }
+
+    async function signInWithWallet() {
+        if (!window.solana || !window.solana.isPhantom) {
+            alert("Phantom Wallet is not installed.");
+            return;
+        }
+
+        try {
+            // Connect to the wallet
+            const response = await window.solana.connect();
+            const walletAddress = response.publicKey.toString();
+
+            // Fetch a message to sign
+            const messageResponse = await fetch('http://localhost:5000/generate-message');
+            const { message } = await messageResponse.json();
+
+            // Sign the message
+            const encodedMessage = new TextEncoder().encode(message);
+            const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
+
+            // Send the signature to the backend
+            const verifyResponse = await fetch('http://localhost:5000/verify-signature', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    wallet_address: walletAddress,
+                    message: message,
+                    signature: signedMessage.signature
+                })
+            });
+
+            const verifyResult = await verifyResponse.json();
+            if (verifyResult.success) {
+                // Update Connect button text
+                const connectButton = document.getElementById('connect-button');
+                connectButton.textContent = `${walletAddress.slice(0, 5)}...`;
+
+                // Enable the settings cogwheel
+                const settingsButton = document.getElementById('settings-button');
+                settingsButton.classList.remove('bg-gray-300', 'text-gray-400', 'cursor-not-allowed');
+                settingsButton.classList.add('bg-gray-100', 'text-gray-800', 'hover:bg-gray-200');
+                settingsButton.disabled = false;
+
+                // Add the wallet address to mock_data.json
+                const addRecordResponse = await fetch('http://localhost:5000/add-record', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ wallet_address: walletAddress })
+                });
+
+                const hiddenAddressField = document.getElementById('hiddenWalletAddress');
+                hiddenAddressField.value = walletAddress;
+
+                const addRecordResult = await addRecordResponse.json();
+                if (addRecordResult.success) {
+                    console.log("Record added:", addRecordResult.message);
+                } else {
+                    console.warn("Could not add record:", addRecordResult.message || addRecordResult.error);
+                }
+            } else {
+                alert("Signature verification failed: " + verifyResult.error);
+            }
+        } catch (error) {
+            console.error("Wallet signing error:", error);
+        }
+    }
   </script>

@@ -10,8 +10,47 @@ import json
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
+MOCK_DATA_FILE = "data/mock_data.json"
+
 # Solana RPC client (optional if you need on-chain validation)
 solana_client = Client("https://api.mainnet-beta.solana.com")
+
+def read_mock_data():
+    if not os.path.exists(MOCK_DATA_FILE):
+        return []
+    with open(MOCK_DATA_FILE, "r") as file:
+        return json.load(file)
+
+def write_mock_data(data):
+    with open(MOCK_DATA_FILE, "w") as file:
+        json.dump(data, file, indent=4)
+
+@app.route('/add-record', methods=['POST'])
+def add_record():
+    data = request.json
+    wallet_address = data.get("wallet_address")
+
+    if not wallet_address:
+        return jsonify({"success": False, "error": "Missing wallet address"}), 400
+
+    mock_data = read_mock_data()
+
+    # Check if wallet_address already exists
+    if any(record.get("wallet_address") == wallet_address for record in mock_data):
+        return jsonify({"success": False, "message": "Wallet address already exists"}), 200
+
+    # Create a new record
+    new_record = {
+        "rank": len(mock_data) + 1,
+        "name": f"Player{len(mock_data) + 1}",
+        "score": 0,
+        "pets": [],
+        "wallet_address": wallet_address
+    }
+    mock_data.append(new_record)
+    write_mock_data(mock_data)
+
+    return jsonify({"success": True, "message": "Record added successfully"}), 201
 
 # Endpoint to generate a message for signing
 @app.route('/generate-message', methods=['GET'])
@@ -42,6 +81,26 @@ def verify_signature():
     except BadSignatureError:
         return jsonify({"success": False, "error": "Invalid signature"}), 400
 
+# Endpoint to verify the signed message
+@app.route('/update-record', methods=['POST'])
+def update_record():
+    data = request.json
+    wallet_address = data.get("wallet_address")
+    new_name = data.get("name")
+
+    if not wallet_address or not new_name:
+        return jsonify({"success": False, "error": "Missing wallet address or name"}), 400
+
+    mock_data = read_mock_data()
+
+    # Find the record by wallet address
+    for record in mock_data:
+        if record.get("wallet_address") == wallet_address:
+            record["name"] = new_name
+            write_mock_data(mock_data)
+            return jsonify({"success": True, "message": "Record updated successfully"}), 200
+
+    return jsonify({"success": False, "error": "Wallet address not found"}), 404
 
 @app.route("/")
 def leaderboard():
@@ -71,6 +130,23 @@ def search_leaderboard():
         filtered_data = leaderboard_data
     
     return render_template("leaderboard_rows.html", data=filtered_data)
+
+@app.route('/get-user-details', methods=['POST'])
+def get_user_details():
+    data = request.json
+    wallet_address = data.get("wallet_address")
+
+    if not wallet_address:
+        return jsonify({"success": False, "error": "Missing wallet address"}), 400
+
+    mock_data = read_mock_data()
+
+    # Find the user by wallet address
+    for record in mock_data:
+        if record.get("wallet_address") == wallet_address:
+            return jsonify({"success": True, "user": record}), 200
+
+    return jsonify({"success": False, "error": "Wallet address not found"}), 404
 
 @app.route("/user-details/<int:rank>")
 def user_details(rank):
